@@ -1,0 +1,58 @@
+# Chaîne automatique vers staging (Project Zero, bac à sable) — posé par l'Atelier le 30/09/2026.
+# Une demande de fusion ouverte par Prométhée (compte promethee-pz) vers `staging` :
+#   1. contrôles  2. passage en « prête » + fusion avec écrasement (co-auteurs conservés)  3. déploiement staging.
+# `main` (production) n'est jamais touchée ici : elle reste fusionnée par un humain.
+name: chaine-staging
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+    branches: [staging]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: chaine-staging-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  controles:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fichiers modifiés non vides
+        run: |
+          git diff --name-only --diff-filter=AM "origin/${{ github.base_ref }}...HEAD" | while read -r f; do
+            [ -s "$f" ] || { echo "::error file=$f::fichier vide"; exit 1; }
+          done
+          echo "Contrôles OK"
+
+  fusion:
+    needs: controles
+    if: github.event.pull_request.user.login == 'promethee-pz' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR: ${{ github.event.pull_request.number }}
+    steps:
+      - name: Prête puis fusion avec écrasement vers staging
+        run: |
+          gh pr ready "$PR" -R "$GITHUB_REPOSITORY" || true
+          gh pr merge "$PR" -R "$GITHUB_REPOSITORY" --squash --delete-branch
+
+  deploiement-staging:
+    needs: fusion
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: staging
+      - name: Déploiement staging (simulé pour le bac à sable)
+        run: |
+          echo "Déployé sur staging : $(git rev-parse --short HEAD)" | tee -a "$GITHUB_STEP_SUMMARY"
+          git log -1 --format='%an — %s%n%b' | tee -a "$GITHUB_STEP_SUMMARY"
