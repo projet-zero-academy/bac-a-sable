@@ -28,4 +28,5 @@ Une demande de fusion ouverte par un autre compte passe par `controles` mais n'e
 | `README.md` | Présentation courte du dépôt. |
 | `TEST-bout-en-bout.md` | Trace du premier essai de bout en bout (création par Prométhée, publication par Sylvain avec « Publish PR »). |
 | `docs/STRUCTURE.md` | Ce document : branches, chaîne vers staging, rôle des fichiers. |
+| `docs/CONTACT.md` | Qui administre le projet. |
 | `.github/workflows/chaine-staging.yml` | Circuit GitHub Actions de la chaîne automatique vers `staging`, copié tel quel du modèle posé par l'Atelier. |
