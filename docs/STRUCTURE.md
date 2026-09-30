@@ -28,6 +28,7 @@ Une demande de fusion ouverte par un autre compte passe par `controles` mais n'e
 | `README.md` | Présentation courte du dépôt. |
 | `TEST-bout-en-bout.md` | Trace du premier essai de bout en bout (création par Prométhée, publication par Sylvain avec « Publish PR »). |
 | `TEST.txt` | Fichier d'essai contenant « TOTO ». |
+| `TTEST.txt` | Fichier d'essai contenant « blabla ». |
 | `docs/STRUCTURE.md` | Ce document : branches, chaîne vers staging, rôle des fichiers. |
 | `docs/CONTACT.md` | Qui administre le projet. |
 | `docs/FAQ.md` | Questions fréquentes sur le bac à sable. |
