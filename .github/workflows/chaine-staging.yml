@@ -1,6 +1,8 @@
 # Chaîne automatique vers staging (Project Zero, bac à sable) — posé par l'Atelier le 30/09/2026.
-# Une demande de fusion ouverte par Prométhée (compte promethee-pz) vers `staging` :
+# Une demande de fusion vers `staging` dont la branche commence par `openclaw/`, venant de ce dépôt (pas d'une copie)
+# et ouverte par promethee-pz, sylvain-ouilleres ou bruceleeFR :
 #   1. contrôles  2. passage en « prête » + fusion avec écrasement (co-auteurs conservés)  3. déploiement staging.
+# Toute autre demande (branche hors `openclaw/`, autre compte, copie) passe les contrôles mais ne fusionne jamais toute seule.
 # `main` (production) n'est jamais touchée ici : elle reste fusionnée par un humain.
 name: chaine-staging
 
@@ -33,7 +35,10 @@ jobs:
 
   fusion:
     needs: controles
-    if: github.event.pull_request.user.login == 'promethee-pz' && github.event.pull_request.head.repo.full_name == github.repository
+    if: >-
+      startsWith(github.event.pull_request.head.ref, 'openclaw/') &&
+      contains(fromJSON('["promethee-pz","sylvain-ouilleres","bruceleeFR"]'), github.event.pull_request.user.login) &&
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
