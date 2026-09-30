@@ -13,10 +13,8 @@ Dépôt de test de Project Zero : il sert à roder la chaîne automatique (deman
 Une demande qu'un humain écrit lui-même dans une session **en worktree** de ce dépôt **vaut accord de publication vers `staging`** (décision des administrateurs, 30/09/2026) : ne pas redemander « je commite ? ». La relecture humaine a lieu sur `staging`, avant toute livraison.
 
 1. **À jour** : avant de modifier, `git fetch origin && git merge --ff-only origin/staging`.
-2. **Carte Workboard** : `workboard_list` pour reprendre une carte existante du même sujet, sinon `workboard_create` (titre = la demande, étiquette `demande:<login GitHub du demandeur>`, statut `running`, notes = clé de cette session, donnée par `session_status`).
-3. **Travail** : faire la demande et la vérifier (relecture, tests s'il y en a). Aucun commit.
-4. **Publication programmée**, dernier geste du tour (pendant le tour, la passerelle refuse de publier) :
-   - trouver la session « Publications automatiques » avec `sessions_list` (recherche par son nom) ;
-   - outil `automations`, action `add` : `schedule {kind:"at", at:<maintenant + 1 min, ISO>}`, `sessionTarget:"session:<clé de « Publications automatiques »>"`, sans livraison, `payload {kind:"agentTurn", message:"Publication automatique Prométhée : lance exactement cette commande avec ton outil Bash et réponds seulement par sa sortie : openclaw gateway call sessions.github.publish --json --timeout 120000 --params '{\"sessionKey\":\"<clé de CETTE session>\",\"idempotencyKey\":\"<clé unique>\",\"title\":\"<titre court>\"}'"}`.
-   - La passerelle committe sous `promethee-pz`, ajoute le demandeur en co-auteur et ouvre la demande de fusion ; le circuit `chaine-staging` la contrôle, la fusionne et déploie `staging`.
-5. **Carte** en `review` ; dire au demandeur : « publication programmée, arrivera sur staging dans quelques minutes ».
+2. **Carte Workboard** : `workboard_list` pour reprendre une carte existante du même sujet, sinon `workboard_create` (titre = la demande, étiquette `demande:<login GitHub du demandeur>`, statut `running`, et dans les notes la ligne `Session : <clé de cette session>`, donnée par `session_status`).
+3. **Travail** : faire la demande et la vérifier (relecture, tests s'il y en a). Aucun commit, aucune publication par l'agent.
+4. **Fin du travail** : passer la carte en `review`. C'est le signal : un script des administrateurs sur le serveur (sans IA) publie ensuite la session une fois le tour terminé (commit sous `promethee-pz`, demandeur en co-auteur, demande de fusion vers `staging`), puis commente la carte avec le lien. Le circuit `chaine-staging` contrôle, fusionne et déploie `staging`.
+5. Dire au demandeur : « terminé, publication automatique dans la minute, arrivera sur staging peu après ».
+- Travail inachevé, question en suspens ou demande floue : **ne pas** passer la carte en `review` (sinon le script publierait).
